@@ -4,16 +4,13 @@ def topo_sort(data):
     """ Topological sort using Kahn's algorithm."""
     indegrees = defaultdict(int)
 
-    # Count in-degrees:
     for node, outs in data.items():
         indegrees[node] += 0
         for out in outs:
             indegrees[out] += 1
 
-    # No prerequisites:
     noprereq = deque([node for node, degree in indegrees.items() if degree == 0])
 
-    # Nice!!! 
     order = deque()
     while noprereq:
         node = noprereq.popleft()
@@ -36,20 +33,17 @@ def count_paths(start='svr',
     Counts paths from start to end. 
     """
 
-    innodes = defaultdict(list)
-    # Count in-degrees:
-    for node, outs in data.items():
-        for out in outs:
-            innodes[out].append(node) # <--- append innodes
+    memo = defaultdict(int)
+    memo[start] = 1
 
-    memo = {}
     nodes = topo_sort(data)
     for node in nodes:
-        if node == start:
-            memo[node] = 1
-        else:
-            memo[node] = sum(memo.get(in_node, 0) for in_node in innodes[node])
+        if memo[node] == 0:
+            continue
 
+        for out in data.get(node, []):
+            memo[out] += memo[node]
+       
     return memo.get(end, 0)
 
 if __name__ == "__main__":
